@@ -11,7 +11,7 @@ import {
   RefreshTokenResponse,
   RegisterRequest,
   User
-} from './types';
+} from '@/features/auth/types';
 
 @Injectable({
   providedIn: 'root'
@@ -102,6 +102,10 @@ export class AuthService {
       }),
       finalize(() => this.loading.set(false))
     );
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUser();
   }
 
   refreshTokens(): Observable<RefreshTokenResponse> {
