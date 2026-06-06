@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { AuthService } from '../../auth.service';
+import { AuthService } from '@/core/services/auth.service';
 import { LoginRequest, User } from '../../types';
 
 type LoginForm = FormGroup<{

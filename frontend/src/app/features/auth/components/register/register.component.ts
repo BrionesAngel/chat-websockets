@@ -13,7 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 
-import { AuthService } from '../../auth.service';
+import { AuthService } from '@/core/services/auth.service';
 import { RegisterRequest, User } from '../../types';
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;

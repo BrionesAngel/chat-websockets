@@ -131,6 +131,19 @@ export class AuthService {
     );
   }
 
+  isTokenValid(): boolean {
+    const token = this.getAccessToken();
+    if (!token) return false;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expMs = payload.exp * 1000;
+      return Date.now() < expMs;
+    } catch {
+      return false;
+    }
+  }
+
   testApi(): Observable<string> {
     return this.http.get(this.endpoint('/api/test'), {
       withCredentials: true,
