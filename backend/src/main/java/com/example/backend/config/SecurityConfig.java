@@ -40,12 +40,13 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // throws Exception
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/chat-websocket/**").permitAll()
         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
         .requestMatchers("/api/auth/logout", "/api/test").authenticated()
             .anyRequest().authenticated())
@@ -63,10 +64,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(
-        "http://localhost:4200",
-        "http://localhost:3000",
-        "https://dev-track-project-manager.vercel.app",
-        "https://dev-track-project-manager-3rbe3b04m.vercel.app"
+        "http://localhost:4200"
     ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
