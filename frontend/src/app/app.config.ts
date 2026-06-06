@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 import { provideSweetAlert2 } from '@sweetalert2/ngx-sweetalert2';
+import { provideLucideIcons } from '@lucide/angular';
 
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { refreshInterceptor } from './core/interceptors/refresh.interceptor';
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideSweetAlert2({
       fireOnInit: false,
       dismissOnDestroy: true
-    })
+    }),
+    provideLucideIcons(),
   ]
 };
