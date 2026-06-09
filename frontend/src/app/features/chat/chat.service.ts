@@ -4,7 +4,8 @@ import { WebSocketService } from '@/core/services/websocket.service';
 import { AuthService } from '@/core/services/auth.service';
 
 export interface ChatMessage {
-  sender: string;
+  sender?: string,
+  recipient: string;
   content: string;
   timestamp: string;
 }
@@ -28,14 +29,12 @@ export class ChatService implements OnDestroy {
     });
   }
 
-  sendMessage(content: string, recipient: string): void {
-    const user = this.authService.getCurrentUser();
-    console.log('usuario actual:', user);
-    console.log('ChatService.sendMessage:', { content, recipient });
+  sendMessage(content: string, recipient: string, sender?: string): void {
+    console.log('ChatService.sendMessage:', { content, recipient, sender });
     this.ws.sendMessage('/chat.sendMessage', {
-      recipient,
       content,
-      timestamp: new Date().toISOString()
+      recipient,
+      sender,
     });
   }
 

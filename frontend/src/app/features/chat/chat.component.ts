@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, NgZone, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, NgZone, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ChatService } from './chat.service';
@@ -21,7 +21,7 @@ import { BackButtonComponent } from "@/shared/back.component";
     <div class="bg-white rounded-t-2xl shadow-lg px-6 py-4 border-b border-gray-200">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-800">💬 Chat en Tiempo Real</h1>
+          <h1 class="text-2xl font-bold text-gray-800">Chat</h1>
           @if (chatStarted) {
             <p class="text-sm text-gray-500 mt-1">
               Chateando con <span class="font-semibold text-blue-600">{{ recipientUsername }}</span>
@@ -30,10 +30,10 @@ import { BackButtonComponent } from "@/shared/back.component";
         </div>
         <div
           class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
-          [ngClass]="connected ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+          [class]="connected ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
         >
           <span class="w-2 h-2 rounded-full"
-            [ngClass]="connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'">
+            [class]="connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'">
           </span>
           {{ connected ? 'Conectado' : 'Desconectado' }}
         </div>
@@ -82,7 +82,7 @@ import { BackButtonComponent } from "@/shared/back.component";
             <div class="flex flex-col">
               <div
                 class="max-w-md px-4 py-3 rounded-2xl shadow-sm"
-                [ngClass]="msg.sender === currentUser?.username
+                [class]="msg.sender === currentUser?.username
                   ? 'bg-linear-to-r from-blue-500 to-indigo-600 text-white ml-auto rounded-br-sm'
                   : 'bg-gray-100 text-gray-800 mr-auto rounded-bl-sm'"
               >
@@ -128,25 +128,24 @@ import { BackButtonComponent } from "@/shared/back.component";
   `
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  private subs = new Subscription();
+
+  @ViewChild('messagesContainer') messagesContainer!: ElementRef;
+
+  private chatService = inject(ChatService);
+  private authService = inject(AuthService);
+  private ngZone = inject(NgZone);
+
   messages = signal<ChatMessage[]>([]);
   messageContent = '';
   recipientUsername = '';
   chatStarted = false;
   connected = false;
-  currentUser: any = null;
+  currentUser = this.authService.currentUser;
 
-  private subs = new Subscription();
-
-  @ViewChild('messagesContainer') messagesContainer!: ElementRef;
-
-  constructor(
-    private chatService: ChatService,
-    private authService: AuthService,
-    private ngZone: NgZone
-  ) { }
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
+    console.log('currentUser al init:', this.currentUser);
 
     this.subs.add(
       this.chatService.connected$.subscribe(c => this.connected = c)
@@ -180,8 +179,16 @@ export class ChatComponent implements OnInit, OnDestroy {
     console.log('recipient:', this.recipientUsername);
     console.log('connected:', this.connected);
     if (this.messageContent.trim() && this.connected) {
-      this.chatService.sendMessage(this.messageContent, this.recipientUsername);
+      const msg: ChatMessage = {
+        sender: this.currentUser,
+        recipient: this.recipientUsername,
+        content: this.messageContent,
+        timestamp: new Date().toISOString()
+      };
+      this.messages.update(msgs => [...msgs, msg]);
+      this.chatService.sendMessage(this.messageContent, this.currentUser?.email, this.recipientUsername);
       this.messageContent = '';
+      setTimeout(() => this.scrollToBottom(), 0);
     }
   }
 

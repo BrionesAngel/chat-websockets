@@ -90,7 +90,7 @@ export class AuthService {
   currentUser$(): Observable<User | null> {
     this.loading.set(true);
 
-    return this.http.get<User>(this.endpoint('/api/auth/me'), { withCredentials: true }).pipe(
+    return this.http.get<User>(this.endpoint('/api/users/profile'), { withCredentials: true }).pipe(
       tap((user) => {
         this.currentUser.set(user);
         this.error.set(null);
